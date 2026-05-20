@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>設定 — ウルトラZAIMUくん</title>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.9.0/dist/tabler-icons.min.css">
+</head>
+<body data-page="settings">
+
+<!-- iPad サイドバーナビ（スマホでは非表示） -->
+<nav class="nav-sidebar" aria-label="メインナビゲーション">
+  <div class="nav-sidebar__logo">ウルトラZAIMUくん</div>
+  <a href="index.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">🏠</span>
+    <span>ホーム</span>
+  </a>
+  <a href="sales.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">💰</span>
+    <span>売上入力</span>
+  </a>
+  <a href="cost.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">💳</span>
+    <span>コスト入力</span>
+  </a>
+  <a href="history.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">📋</span>
+    <span>履歴・修正</span>
+  </a>
+  <a href="settings.html" class="sidebar-item sidebar-item--active" aria-current="page">
+    <span class="sidebar-item__icon" aria-hidden="true">⚙️</span>
+    <span>設定</span>
+  </a>
+</nav>
+
+<div class="page-wrapper">
+
+  <!-- ページヘッダー -->
+  <header class="settings-header">
+    <span class="settings-header__title">設定</span>
+  </header>
+
+  <!-- スクロール本体（iPad：600px中央寄せ） -->
+  <div class="ipad-settings-wrap" style="padding-bottom:calc(var(--nav-height) + env(safe-area-inset-bottom) + 16px);">
+
+    <!-- ② スタッフ管理 -->
+    <section class="settings-section" aria-labelledby="sec-staff">
+      <button class="settings-accordion-btn" type="button" aria-expanded="true" aria-controls="sec-staff-body" onclick="toggleSettingsAccordion(this)">
+        <span id="sec-staff">スタッフ管理</span>
+        <span class="settings-accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-section__body" id="sec-staff-body">
+        <!-- スタッフ一覧 -->
+        <div id="staff-list-container" role="list" aria-label="登録スタッフ一覧">
+          <!-- settings.js が描画 -->
+        </div>
+        <!-- スタッフ追加 -->
+        <div class="staff-add-row" style="flex-wrap:wrap;">
+          <input type="text"
+                 id="staff-add-input"
+                 class="staff-add-input"
+                 placeholder="スタッフ名"
+                 maxlength="20"
+                 autocomplete="off"
+                 aria-label="追加するスタッフ名">
+          <select id="staff-add-emp"
+                  class="form-select"
+                  style="height:40px;font-size:13px;flex-shrink:0;"
+                  aria-label="雇用形態">
+            <option value="employed_full">常勤雇用（社員）</option>
+            <option value="employed_temp">臨時アルバイト</option>
+            <option value="contractor">委託・外注</option>
+          </select>
+          <input type="text"
+                 id="staff-add-password"
+                 class="staff-add-input"
+                 style="flex:1;min-width:140px;"
+                 placeholder="パスワード（5桁英数字）"
+                 maxlength="5"
+                 autocomplete="off"
+                 aria-label="スタッフ枠パスワード">
+          <button id="staff-add-btn"
+                  class="staff-add-btn"
+                  type="button">追加</button>
+        </div>
+        <p style="padding:6px 16px 14px;font-size:12px;color:var(--uz-muted);line-height:1.6;">
+          パスワードはやめたスタッフのログイン防止に使用します。退職時はこの画面から「編集」でパスワードを変更し、必要に応じて名前も変更すれば、同じ枠を新しいスタッフに引き継げます。<br>
+          打刻はワンタップで行うため、スタッフ自身がパスワードを入力する場面はありません。
+        </p>
+      </div>
+    </section>
+
+    <!-- ③ サービスマスタ -->
+    <section class="settings-section" aria-labelledby="sec-service">
+      <button class="settings-accordion-btn" type="button" aria-expanded="true" aria-controls="sec-service-body" onclick="toggleSettingsAccordion(this)">
+        <span id="sec-service">サービスマスタ（売上区分）<span id="service-count-badge" class="settings-count-badge" hidden></span></span>
+        <span class="settings-accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-section__body" id="sec-service-body">
+        <!-- サービス一覧 -->
+        <div id="service-list-container" role="list" aria-label="登録サービス一覧">
+          <!-- settings.js が描画 -->
+        </div>
+        <!-- 上限到達メッセージ -->
+        <p id="service-limit-hint"
+           hidden
+           style="padding:10px 16px 4px;font-size:12px;color:var(--uz-muted);">
+        </p>
+        <!-- サービス追加フォーム -->
+        <div id="service-add-row" class="staff-add-row" style="align-items:center;flex-wrap:wrap;gap:8px;">
+          <input type="text"
+                 id="service-add-name"
+                 class="staff-add-input"
+                 style="flex:2;min-width:120px;"
+                 placeholder="サービス名（例：店内売上）"
+                 maxlength="30"
+                 autocomplete="off"
+                 aria-label="追加するサービス名">
+          <select id="service-add-tax"
+                  class="form-select"
+                  style="flex:1;min-width:80px;height:40px;"
+                  aria-label="税率">
+            <option value="10">10%</option>
+            <option value="8">8%（軽減）</option>
+            <option value="0">0%（非課税）</option>
+          </select>
+          <button id="service-add-btn"
+                  class="staff-add-btn"
+                  type="button">追加</button>
+        </div>
+        <div style="padding:6px 16px 14px;">
+          <p style="font-size:12px;color:var(--uz-muted);line-height:1.6;" id="service-help-text">
+            事業単位で登録してください（例：店内売上・テイクアウト・ケータリング）。<br>
+            「諸口」は自動で表示されます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③-A 仕入原価マスタ（6-G フェーズ2 新設） -->
+    <section class="settings-section" aria-labelledby="sec-purchase">
+      <button class="settings-accordion-btn" type="button" aria-expanded="true" aria-controls="sec-purchase-body" onclick="toggleSettingsAccordion(this)">
+        <span id="sec-purchase">仕入原価マスタ<span id="purchase-count-badge" class="settings-count-badge" hidden></span></span>
+        <span class="settings-accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-section__body" id="sec-purchase-body">
+        <!-- 仕入マスタ一覧 -->
+        <div id="purchase-list-container" role="list" aria-label="登録仕入原価科目一覧">
+          <!-- settings.js が描画 -->
+        </div>
+        <!-- 上限到達メッセージ -->
+        <p id="purchase-limit-hint"
+           hidden
+           style="padding:10px 16px 4px;font-size:12px;color:var(--uz-muted);">
+        </p>
+        <!-- 仕入科目追加フォーム -->
+        <div id="purchase-add-row" class="staff-add-row" style="align-items:center;flex-wrap:wrap;gap:8px;">
+          <input type="text"
+                 id="purchase-add-name"
+                 class="staff-add-input"
+                 style="flex:2;min-width:120px;"
+                 placeholder="仕入科目名（例：食材費）"
+                 maxlength="30"
+                 autocomplete="off"
+                 aria-label="追加する仕入科目名">
+          <select id="purchase-add-tax"
+                  class="form-select"
+                  style="flex:1;min-width:80px;height:40px;"
+                  aria-label="税率">
+            <option value="10">10%</option>
+            <option value="8">8%（軽減）</option>
+            <option value="0">0%（非課税）</option>
+          </select>
+          <button id="purchase-add-btn"
+                  class="staff-add-btn"
+                  type="button">追加</button>
+        </div>
+        <div style="padding:6px 16px 14px;">
+          <p style="font-size:12px;color:var(--uz-muted);line-height:1.6;" id="purchase-help-text">
+            仕入原価の科目を登録してください（例：食材費・酒類仕入・薬剤費）。<br>
+            「諸口」は自動で表示されます。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ③-B コスト科目マスタ -->
+    <section class="settings-section" aria-labelledby="sec-cost-master">
+      <button class="settings-accordion-btn" type="button" aria-expanded="true" aria-controls="sec-cost-master-body" onclick="toggleSettingsAccordion(this)">
+        <span id="sec-cost-master">コスト科目マスタ（確定申告書 科目番号対応）</span>
+        <span class="settings-accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-section__body" id="sec-cost-master-body">
+        <div id="cost-master-container">
+          <!-- settings.js が描画 -->
+        </div>
+        <div style="padding:10px 16px 14px;">
+          <button id="cost-master-save-btn"
+                  class="submit-btn submit-btn--blue"
+                  type="button"
+                  style="height:44px;font-size:14px;border-radius:var(--radius-md);">
+            科目マスタを保存する
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ④ 基本情報 -->
+    <section class="settings-section" aria-labelledby="sec-info">
+      <button class="settings-accordion-btn" type="button" aria-expanded="false" aria-controls="sec-info-body" onclick="toggleSettingsAccordion(this)">
+        <span id="sec-info">基本情報</span>
+        <span class="settings-accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="settings-section__body" id="sec-info-body">
+        <div class="info-row">
+          <span class="info-row__key">店舗名</span>
+          <span id="info-store-name" class="info-row__val">—</span>
+        </div>
+        <div class="info-row" id="info-business-hours-row" hidden>
+          <span class="info-row__key">営業時間</span>
+          <span id="info-business-hours" class="info-row__val">—</span>
+        </div>
+        <div class="info-row">
+          <span class="info-row__key">プラン</span>
+          <span class="info-row__val">レオ</span>
+        </div>
+        <div class="info-row">
+          <span class="info-row__key">提供元</span>
+          <span class="info-row__val">株式会社ターゲット</span>
+        </div>
+        <div class="info-row">
+          <span class="info-row__key">バージョン</span>
+          <span id="info-version" class="info-row__val" style="cursor:pointer;user-select:none;" title="サポート用情報">1.0.0</span>
+        </div>
+
+        <!-- GAS接続情報（既定非表示・バージョンを5回タップで展開） -->
+        <div id="info-debug" hidden>
+          <div class="info-row" style="margin-top:8px;border-top:1px dashed var(--uz-border);padding-top:10px;">
+            <span class="info-row__key">GAS接続状態</span>
+            <span id="gas-status-val" class="info-row__val" style="color:var(--uz-muted);">確認中...</span>
+          </div>
+          <div class="info-row" style="flex-direction:column;align-items:flex-start;gap:4px;">
+            <span class="info-row__key">WebアプリURL</span>
+            <span id="gas-url-val" class="info-row__url" title="GAS WebアプリURL"></span>
+          </div>
+        </div>
+
+        <p style="padding:10px 16px 14px;font-size:12px;color:var(--uz-muted);line-height:1.6;">
+          店舗情報は株式会社ターゲットが管理します。<br>
+          変更が必要な場合はサポートにご連絡ください。
+        </p>
+      </div>
+    </section>
+
+
+    <!-- フッター -->
+    <div class="settings-footer">
+      ウルトラZAIMUくん LEO版<br>
+      © 2026 株式会社ターゲット<br>
+      <span style="font-size:10px;">AI提案の自動確定は行いません。すべての操作はユーザーが確定してください。</span>
+    </div>
+
+  </div><!-- /scroll body -->
+
+</div><!-- /page-wrapper -->
+
+<!-- ボトムナビゲーション（スマホ用） -->
+<nav class="bottom-nav" aria-label="メインナビゲーション">
+
+  <a href="index.html" class="nav-item">
+    <i class="ti ti-planet nav-item__icon" aria-hidden="true"></i>
+    <span class="nav-item__label">ホーム</span>
+  </a>
+
+  <a href="pl.html" class="nav-item">
+    <i class="ti ti-chart-bar nav-item__icon" aria-hidden="true"></i>
+    <span class="nav-item__label">損益</span>
+  </a>
+
+  <a href="history.html" class="nav-item">
+    <i class="ti ti-history nav-item__icon" aria-hidden="true"></i>
+    <span class="nav-item__label">履歴・修正</span>
+  </a>
+
+  <a href="settings.html" class="nav-item nav-item--active" aria-current="page">
+    <i class="ti ti-settings nav-item__icon" aria-hidden="true"></i>
+    <span class="nav-item__label">設定</span>
+  </a>
+
+</nav>
+
+<!-- ローディングオーバーレイ -->
+<div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+  <div class="spinner"></div>
+</div>
+
+<!-- AIフック（フェーズ3用・削除禁止） -->
+<div id="receipt-capture-area" style="display:none"></div>
+<div id="csv-import-area"      style="display:none"></div>
+<div id="ai-suggestion-area"   style="display:none"></div>
+
+<script src="js/app.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#FFFFFF">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>売上入力 — ウルトラZAIMUくん</title>
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/forms.css">
+</head>
+<body data-page="sales">
+
+<!-- iPad サイドバーナビ（スマホでは非表示） -->
+<nav class="nav-sidebar" aria-label="メインナビゲーション">
+  <div class="nav-sidebar__logo">ウルトラZAIMUくん</div>
+  <a href="index.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">🏠</span>
+    <span>ホーム</span>
+  </a>
+  <a href="sales.html" class="sidebar-item sidebar-item--active" aria-current="page">
+    <span class="sidebar-item__icon" aria-hidden="true">💰</span>
+    <span>売上入力</span>
+  </a>
+  <a href="cost.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">💳</span>
+    <span>コスト入力</span>
+  </a>
+  <a href="history.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">📋</span>
+    <span>履歴・修正</span>
+  </a>
+  <a href="settings.html" class="sidebar-item">
+    <span class="sidebar-item__icon" aria-hidden="true">⚙️</span>
+    <span>設定</span>
+  </a>
+</nav>
+
+<div class="page-wrapper">
+
+  <!-- サブページヘッダー -->
+  <header class="sub-header">
+    <a href="index.html" class="sub-header__back" aria-label="ホームに戻る">
+      ‹ 戻る
+    </a>
+    <span class="sub-header__title">売上入力</span>
+    <div style="width:60px;"></div>
+  </header>
+
+  <!-- iPad 2カラムラッパー -->
+  <div class="ipad-form-wrap" id="ipad-form-main">
+
+  <!-- 左カラム（iPad専用）：当月売上一覧 -->
+  <div class="ipad-history-panel">
+    <div class="ipad-history-panel__header">当月の売上入力済み（最大20件）</div>
+    <div class="ipad-hist-scroll">
+      <table class="ipad-hist-table">
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>サービス名</th>
+            <th class="ipad-td-r">税込金額</th>
+            <th class="ipad-td-c">未収</th>
+          </tr>
+        </thead>
+        <tbody id="ipad-sales-tbody">
+          <tr><td colspan="4" class="ipad-hist-empty">読み込み中...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 入力フォーム（iPad右カラム / モバイルはメイン） -->
+  <div class="form-body">
+
+    <!-- ① 発生日（sticky固定） -->
+    <div class="form-section form-section--sticky">
+      <label class="form-section__label" for="date-input">発生日</label>
+      <input type="date" id="date-input" class="date-input" aria-label="発生日">
+    </div>
+
+    <!-- ② サービス選択 -->
+    <div class="form-section">
+      <span class="form-section__label">サービス</span>
+      <div id="service-cards"
+           class="radio-card-group radio-card-group--last-full"
+           role="radiogroup" aria-label="サービス選択">
+        <!-- sales.js が描画 -->
+      </div>
+    </div>
+
+    <!-- ③ 諸口品目名（諸口選択時のみ） -->
+    <div class="form-section" id="misc-section" hidden>
+      <label class="form-section__label" for="misc-name-input">品目名</label>
+      <input type="text" id="misc-name-input" class="text-input"
+             placeholder="品目名を入力（例：手土産代）" maxlength="50" autocomplete="off">
+      <p class="form-hint">マスタ未登録の品目を記録する場合に入力してください。</p>
+    </div>
+
+    <!-- ④ 税率 -->
+    <div class="form-section">
+      <span class="form-section__label">税率</span>
+      <div class="tax-toggle" role="group" aria-label="税率選択">
+        <button class="tax-btn" data-rate="0"  type="button" aria-pressed="false"> 0%</button>
+        <button class="tax-btn" data-rate="8"  type="button" aria-pressed="false"> 8%</button>
+        <button class="tax-btn" data-rate="10" type="button" aria-pressed="false">10%</button>
+      </div>
+      <p class="form-hint">サービスのデフォルト税率が自動セットされます。変更は例外時のみ。</p>
+    </div>
+
+    <!-- ⑤ 金額入力 -->
+    <div class="form-section">
+      <span class="form-section__label">売上入力（税込み）</span>
+      <div class="amount-wrap amount-wrap--blue">
+        <span class="amount-prefix" aria-hidden="true">¥</span>
+        <input type="text" id="amount-input" class="amount-input"
+               inputmode="numeric" pattern="[0-9]*" placeholder="0"
+               maxlength="10" autocomplete="off" aria-label="税込金額">
+      </div>
+      <div class="tax-display" aria-live="polite">
+        <div class="tax-display-item">
+          <div class="tax-display-item__label">税抜金額</div>
+          <div id="tax-excluded" class="tax-display-item__value tax-display-item__value--blue">¥—</div>
+        </div>
+        <div class="tax-display-item">
+          <div class="tax-display-item__label">消費税</div>
+          <div id="tax-amount" class="tax-display-item__value tax-display-item__value--blue">¥—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ⑥ 売掛チェック -->
+    <div class="form-section">
+      <label class="uncollected-check-row">
+        <input type="checkbox" id="uncollected-toggle" class="uncollected-check">
+        <span class="uncollected-check-label">□ 売掛（未入金）として登録</span>
+      </label>
+    </div>
+
+    <!-- ⑦ メモ -->
+    <div class="form-section">
+      <label class="form-section__label" for="memo-input">メモ（任意）</label>
+      <input type="text" id="memo-input" class="text-input"
+             placeholder="例：3名来店、ボトル持参" maxlength="100" autocomplete="off">
+    </div>
+
+    <!-- ⑧ 個別管理アコーディオン（上級者向け） -->
+    <div class="accordion-section">
+      <button class="accordion-header" type="button"
+              id="indiv-accordion-btn"
+              onclick="toggleAccordion()"
+              aria-expanded="false"
+              aria-controls="indiv-accordion-body">
+        <span>⚙ 個別管理（上級者向け）</span>
+        <span class="accordion-chevron" aria-hidden="true">›</span>
+      </button>
+      <div class="accordion-body" id="indiv-accordion-body" hidden>
+        <p id="indiv-accordion-hint" class="form-hint" style="margin-bottom:14px;">
+          ⚠ 個別管理分は売上入力とは別に追加登録されます。売上入力時に個別分を差し引いて入力してください。
+        </p>
+        <div id="indiv-rows"></div>
+        <button type="button" class="indiv-add-btn" onclick="addIndividualRow()">
+          ＋ 行を追加
+        </button>
+      </div>
+    </div>
+
+  </div><!-- /form-body -->
+
+  </div><!-- /ipad-form-wrap -->
+
+  <!-- iPad 売上入力パネル（iPad のみ表示） -->
+  <div class="ipad-sc-wrap" id="ipad-sc-wrap">
+
+    <!-- 左カラム：サマリー + フィルタ + 一覧 -->
+    <div class="ipad-sc-left">
+      <div class="ipad-summary-cards">
+        <div class="ipad-summary-card">
+          <div class="ipad-summary-card__label">当月売上合計</div>
+          <div class="ipad-summary-card__value" id="ipad-month-total">---</div>
+        </div>
+        <div class="ipad-summary-card ipad-summary-card--amber">
+          <div class="ipad-summary-card__label">未収</div>
+          <div class="ipad-summary-card__value" id="ipad-unpaid-count">---件</div>
+        </div>
+        <div class="ipad-summary-card">
+          <div class="ipad-summary-card__label">今月の入力件数</div>
+          <div class="ipad-summary-card__value" id="ipad-entry-count">---件</div>
+        </div>
+      </div>
+      <div class="ipad-filter-bar">
+        <select id="ipad-filter-month" class="ipad-filter-select" aria-label="表示月"></select>
+        <select id="ipad-filter-state" class="ipad-filter-select" aria-label="状態">
+          <option value="all">すべて</option>
+          <option value="unpaid">未収のみ</option>
+          <option value="locked">ロックのみ</option>
+        </select>
+      </div>
+      <div class="ipad-list-body" id="ipad-sales-list">
+        <div class="ipad-list-empty">読み込み中...</div>
+      </div>
+    </div><!-- /ipad-sc-left -->
+
+    <!-- 右カラム：タブ + フォーム -->
+    <div class="ipad-sc-right">
+      <div class="ipad-input-tabs">
+        <button class="ipad-tab ipad-tab--active" data-tab="add" type="button">売上を追加</button>
+        <button class="ipad-tab" data-tab="uncollected" type="button">未収一覧</button>
+      </div>
+      <div id="ipad-tab-add" class="ipad-tab-content">
+        <!-- form-bodyをJSで移動 -->
+      </div>
+      <div id="ipad-tab-uncollected" class="ipad-tab-content" style="display:none">
+        <div class="ipad-unpaid-list" id="ipad-unpaid-list">
+          <div class="ipad-list-empty">読み込み中...</div>
+        </div>
+      </div>
+    </div><!-- /ipad-sc-right -->
+
+  </div><!-- /ipad-sc-wrap -->
+
+</div><!-- /page-wrapper -->
+
+<!-- 登録ボタン（固定） -->
+<div class="submit-bar">
+  <button id="submit-btn" class="submit-btn submit-btn--blue" type="button">
+    登録する
+  </button>
+</div>
+
+<!-- ローディングオーバーレイ -->
+<div id="loading-overlay" class="loading-overlay" aria-hidden="true">
+  <div class="spinner"></div>
+</div>
+
+<!-- AIフック（フェーズ3用・削除禁止） -->
+<div id="receipt-capture-area" style="display:none"></div>
+<div id="csv-import-area"      style="display:none"></div>
+<div id="ai-suggestion-area"   style="display:none"></div>
+
+<script src="js/app.js"></script>
+<script src="js/sales.js"></script>
+</body>
+</html>
